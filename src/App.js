@@ -3,8 +3,6 @@ import "./App.css";
 import { pairs } from "./data";
 
 const directions = ["East", "West", "South", "North"];
-const primeWords = ["apple", "banana", "cherry", "date"];
-const nonWords = ["aaple", "bannana", "chrrey", "datte"];
 
 const getRandomElement = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
@@ -53,38 +51,40 @@ function App() {
   };
 
   return (
-    <div className="App">
-      <div className="grid-container">
-        {Array.from({ length: 9 }).map((_, index) => (
-          <div key={index} className="grid-item">
-            {step === 2 && match(primePosition, index) && (
-              <Prime word={pair.prime} position={primePosition} />
-            )}
+    <>
+      <div className="App">
+        <div className="grid-container">
+          {Array.from({ length: 9 }).map((_, index) => (
+            <div key={index} className="grid-item">
+              {step === 2 && match(primePosition, index) && (
+                <Prime word={pair.prime} position={primePosition} />
+              )}
 
-            {index === 4 && (
-              <>
-                {step === 1 && <Arrow direction={direction} />}
-                {step === 3 && <Mask />}
-                {step === 4 && (
-                  <Target
-                    word={pair.target}
-                    onRespond={handleResponse}
-                    processing={processing}
-                  />
-                )}
-              </>
-            )}
-          </div>
-        ))}
+              {index === 4 && (
+                <>
+                  {step === 1 && <Arrow direction={direction} />}
+                  {step === 3 && <Mask />}
+                  {step === 4 && (
+                    <Target
+                      word={pair.target}
+                      onRespond={handleResponse}
+                      processing={processing}
+                    />
+                  )}
+                </>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
 
       {responseTime !== null && (
-        <div>
+        <div className="Nav">
           <p>Response Time: {responseTime}ms</p>
           <p>Type: {pair.type}</p>
         </div>
       )}
-    </div>
+    </>
   );
 }
 
