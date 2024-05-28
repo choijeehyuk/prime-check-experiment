@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import "./App.css";
+import { pairs } from "./data";
 
 const directions = ["East", "West", "South", "North"];
 const primeWords = ["apple", "banana", "cherry", "date"];
@@ -10,21 +11,20 @@ const getRandomElement = (arr) => arr[Math.floor(Math.random() * arr.length)];
 function App() {
   const [step, setStep] = useState(0);
   const [direction, setDirection] = useState("");
-  const [prime, setPrime] = useState("");
+  const [pair, setPair] = useState({ prime: "", target: "", type: 0 });
+
   const [primePosition, setPrimePosition] = useState("");
-  const [target, setTarget] = useState("");
   const [startTime, setStartTime] = useState(0);
   const [responseTime, setResponseTime] = useState(null);
-  const [isRealWord, setIsRealWord] = useState(null);
+
+  const [processing, setProcessing] = useState(false);
 
   const resetExperiment = useCallback(() => {
     setDirection(getRandomElement(directions));
-    setPrime(getRandomElement([...primeWords, ...nonWords]));
+    setPair(getRandomElement(pairs));
     setPrimePosition(getRandomElement(directions));
-    setTarget(getRandomElement([...primeWords, ...nonWords]));
     setStep(1);
     setResponseTime(null);
-    setIsRealWord(null);
   }, []);
 
   useEffect(() => {
@@ -41,34 +41,61 @@ function App() {
     }
   }, [step, resetExperiment]);
 
-  const handleResponse = (isWord) => {
+  const handleResponse = () => {
+    if (processing) return;
+    setProcessing(true);
     const responseTime = Date.now() - startTime;
     setResponseTime(responseTime);
-    setIsRealWord(isWord === primeWords.includes(target));
-    setTimeout(() => setStep(0), 1000); // Reset experiment after showing results
+    setTimeout(() => {
+      setProcessing(false);
+      setStep(0);
+    }, 1000);
   };
 
   return (
     <div className="App">
-      {step === 1 && <Arrow direction={direction} />}
-      {step === 2 && <Prime word={prime} position={primePosition} />}
-      {step === 3 && <Mask />}
-      {step === 4 && <Target word={target} onRespond={handleResponse} />}
+      <div className="grid-container">
+        {Array.from({ length: 9 }).map((_, index) => (
+          <div key={index} className="grid-item">
+            {step === 2 && match(primePosition, index) && (
+              <Prime word={pair.prime} position={primePosition} />
+            )}
+
+            {index === 4 && (
+              <>
+                {step === 1 && <Arrow direction={direction} />}
+                {step === 3 && <Mask />}
+                {step === 4 && (
+                  <Target
+                    word={pair.target}
+                    onRespond={handleResponse}
+                    processing={processing}
+                  />
+                )}
+              </>
+            )}
+          </div>
+        ))}
+      </div>
+
       {responseTime !== null && (
         <div>
           <p>Response Time: {responseTime}ms</p>
-          <p>Correct: {isRealWord ? "Yes" : "No"}</p>
+          <p>Type: {pair.type}</p>
         </div>
       )}
     </div>
   );
 }
 
-const Arrow = ({ direction }) => (
-  <div className="Arrow">
-    <p>→ {direction}</p>
-  </div>
-);
+const arrows = ["→", "←", "↓", "↑"];
+const Arrow = ({ direction }) => {
+  return (
+    <div className="Arrow">
+      <p>{arrows[directions.findIndex((d) => d === direction)]}</p>
+    </div>
+  );
+};
 
 const Prime = ({ word, position }) => (
   <div className={`Prime ${position}`}>
@@ -103,3 +130,12 @@ const Target = ({ word, onRespond }) => {
 };
 
 export default App;
+
+const match = (position, index) => {
+  return (
+    (position === directions[0] && index === 5) ||
+    (position === directions[1] && index === 3) ||
+    (position === directions[2] && index === 7) ||
+    (position === directions[3] && index === 1)
+  );
+};

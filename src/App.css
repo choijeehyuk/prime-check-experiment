@@ -1,5 +1,28 @@
 .App {
   text-align: center;
+  width: 100vw;
+  margin-top: 10%;
+  /* height: 100vh; */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(3, 200px);
+  grid-template-rows: repeat(3, 200px);
+  gap: 10px;
+}
+
+.grid-item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #000;
+  font-size: 24px;
+  font-weight: bold;
 }
 
 .Arrow,
@@ -12,30 +35,6 @@
 
 .Prime {
   position: absolute;
-}
-
-.Prime.East {
-  top: 50%;
-  left: 80%;
-  transform: translate(-50%, -50%);
-}
-
-.Prime.West {
-  top: 50%;
-  left: 20%;
-  transform: translate(-50%, -50%);
-}
-
-.Prime.South {
-  top: 80%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.Prime.North {
-  top: 20%;
-  left: 50%;
-  transform: translate(-50%, -50%);
 }
 
 .Mask {
