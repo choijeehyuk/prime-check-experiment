@@ -20,7 +20,6 @@
   justify-content: center;
   align-items: center;
   border: 1px solid #000;
-  font-size: 20px;
   font-weight: bold;
 }
 
@@ -32,12 +31,17 @@
   align-items: center;
 }
 
-.Arrow,
 .Prime,
 .Mask,
 .Target {
   font-size: 2em;
   margin: 20px;
+}
+
+.Arrow {
+  font-size: 10em;
+  margin: 20px;
+  color: red;
 }
 
 .Prime {
