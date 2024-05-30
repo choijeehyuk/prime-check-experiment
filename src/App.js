@@ -7,7 +7,7 @@ const directions = ["East", "West", "South", "North"];
 const getRandomElement = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
 function App() {
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState(-1);
   const [direction, setDirection] = useState("");
   const [pair, setPair] = useState({ prime: "", target: "", type: 0 });
 
@@ -25,8 +25,13 @@ function App() {
     setResponseTime(null);
   }, []);
 
+  const [hasStarted, setHasStarted] = useState(false);
+
   useEffect(() => {
-    if (step === 0) {
+    if (!hasStarted) return;
+    if (step === -1) {
+      setTimeout(() => setStep(0), 1000);
+    } else if (step === 0) {
       resetExperiment();
     } else if (step === 1) {
       setTimeout(() => setStep(2), 100);
@@ -37,7 +42,7 @@ function App() {
     } else if (step === 4) {
       setStartTime(Date.now());
     }
-  }, [step, resetExperiment]);
+  }, [hasStarted, step, resetExperiment]);
 
   const handleResponse = () => {
     if (processing) return;
@@ -50,32 +55,65 @@ function App() {
     }, 1000);
   };
 
+  useEffect(() => {
+    window.addEventListener("keydown", () => {
+      if (!hasStarted) {
+        setHasStarted(true);
+      }
+    });
+  }, []);
+
   return (
     <>
       <div className="App">
-        <div className="grid-container">
-          {Array.from({ length: 9 }).map((_, index) => (
-            <div key={index} className="grid-item">
-              {step === 2 && match(primePosition, index) && (
-                <Prime word={pair.prime} position={primePosition} />
-              )}
+        {!hasStarted && (
+          <div className="init-container">
+            <p>안녕하세요.</p>
+            <p>실험에 참여한 것을 환영합니다.</p>
+            <p>화면의 중앙의 점을</p>
+            <p>응시하면, 검은색 단어가 화면 중앙에 나타날 것입니다.</p>
+            <p>나타난 검은색</p>
+            <p>단어가 단어라면 F, 단어가 아니라면 J를 눌러주세요.</p>
+            <p>최대한 빨리</p>
+            <p>판단할 수 있도록 노력해보세요!</p>
+            <p>
+              한번씩 판단을 내릴 때마다, 다음 단어가 나오기 전 잠시동안 중앙의
+              점이 등장합니다.
+            </p>
+            <p>점을 응시해주세요.</p>
+            <p>아무키나 누르면 실험이 시작됩니다.</p>
+            <p>실험 예상 소요 시간은 5분입니다.</p>
+          </div>
+        )}
 
-              {index === 4 && (
-                <>
-                  {step === 1 && <Arrow direction={direction} />}
-                  {step === 3 && <Mask />}
-                  {step === 4 && (
-                    <Target
-                      word={pair.target}
-                      onRespond={handleResponse}
-                      processing={processing}
-                    />
-                  )}
-                </>
-              )}
-            </div>
-          ))}
-        </div>
+        {hasStarted && (
+          <div className="grid-container">
+            {Array.from({ length: 9 }).map((_, index) => (
+              <div key={index} className="grid-item">
+                {step === 2 && match(primePosition, index) && (
+                  <Prime word={pair.prime} position={primePosition} />
+                )}
+
+                {index === 4 && (
+                  <>
+                    {step === -1 && <div className="dot">•</div>}
+                    {(step === 1 || step === 2) && (
+                      <Arrow direction={direction} />
+                    )}
+                    {step === 3 && <Mask />}
+                    {step === 4 && (
+                      <Target
+                        word={pair.target}
+                        onRespond={handleResponse}
+                        processing={processing}
+                      />
+                    )}
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {responseTime !== null && (
@@ -111,6 +149,7 @@ const Mask = () => (
 
 const Target = ({ word, onRespond }) => {
   useEffect(() => {
+    // 여기서 맞았는지도 테스트해야할듯?
     const handleKeydown = (event) => {
       if (event.key === "f" || event.key === "F") {
         onRespond(true);

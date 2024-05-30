@@ -21,6 +21,7 @@
   align-items: center;
   border: 1px solid #000;
   font-weight: bold;
+  font-size: 20px;
 }
 
 .Nav {
@@ -31,15 +32,19 @@
   align-items: center;
 }
 
-.Prime,
 .Mask,
 .Target {
   font-size: 2em;
   margin: 20px;
 }
 
+.Prime {
+  font-size: 2em;
+  color: red;
+}
+
 .Arrow {
-  font-size: 10em;
+  font-size: 8em;
   margin: 20px;
   color: red;
 }
@@ -48,18 +53,12 @@
   position: absolute;
 }
 
-.Mask {
-  font-size: 2em;
-  margin: 20px;
-}
-
-.Target {
-  font-size: 2em;
-  margin: 20px;
-}
-
 button {
   margin: 10px;
   padding: 10px 20px;
   font-size: 1em;
+}
+
+.dot {
+  font-size: 100px;
 }
