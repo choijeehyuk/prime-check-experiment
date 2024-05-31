@@ -1,3 +1,13 @@
+// type 0 : isF : true
+// type 1 : isF true
+// type 2 : isF : false
+// type 3 : isF : true
+
+// 화살표 match true or false
+// type 0 + 화살표 매칭 데이터
+// type 1 + 화살표 매칭 데이터
+// type 2 + 화살표
+
 export const pairs = [
   { prime: "사과", target: "바나나", type: 0 },
   { prime: "테이블", target: "의자", type: 0 },

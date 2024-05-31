@@ -6,7 +6,17 @@ const directions = ["East", "West", "South", "North"];
 
 const getRandomElement = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
+const TOTAL_COUNT = 10;
+
+// type
+const data = [
+  { Name: "John Doe", Age: 28, Country: "USA" },
+  { Name: "Anna Smith", Age: 24, Country: "UK" },
+  { Name: "Peter Johnson", Age: 32, Country: "Canada" },
+];
+
 function App() {
+  const [total, setTotal] = useState(1);
   const [step, setStep] = useState(-1);
   const [direction, setDirection] = useState("");
   const [pair, setPair] = useState({ prime: "", target: "", type: 0 });
@@ -26,6 +36,31 @@ function App() {
   }, []);
 
   const [hasStarted, setHasStarted] = useState(false);
+  const [finalEnd, setFinalEnd] = useState(false);
+
+  const [result, setResult] = useState([]);
+
+  const handleCopy = () => {
+    const list = [];
+
+    for (const { isF, responseTime, type, isMatched } of result) {
+      list.push({
+        type: getType(type, isMatched),
+        responseTime,
+        isCorrected: getIsCorrected(isF, type),
+      });
+    }
+
+    const copiedData = JSON.stringify(list, null, 2);
+    navigator.clipboard
+      .writeText(copiedData)
+      .then(() => {
+        alert("Data copied to clipboard");
+      })
+      .catch((err) => {
+        console.error("Failed to copy: ", err);
+      });
+  };
 
   useEffect(() => {
     if (!hasStarted) return;
@@ -44,11 +79,27 @@ function App() {
     }
   }, [hasStarted, step, resetExperiment]);
 
-  const handleResponse = () => {
+  const handleResponse = (isF) => {
     if (processing) return;
     setProcessing(true);
+
     const responseTime = Date.now() - startTime;
     setResponseTime(responseTime);
+
+    const data = {
+      isF,
+      responseTime,
+      type: pair.type,
+      isMatched: direction === primePosition,
+    };
+
+    const state = [...result, data];
+    setResult(state);
+
+    setTotal((prev) => prev + 1);
+    if (total === TOTAL_COUNT) {
+      setFinalEnd(true);
+    }
     setTimeout(() => {
       setProcessing(false);
       setStep(0);
@@ -66,7 +117,15 @@ function App() {
   return (
     <>
       <div className="App">
-        {!hasStarted && (
+        {finalEnd && (
+          <div>
+            <Table data={data} />
+
+            <button onClick={handleCopy}>결과 복사하기</button>
+          </div>
+        )}
+
+        {!hasStarted && !finalEnd && (
           <div className="init-container">
             <p>안녕하세요.</p>
             <p>실험에 참여한 것을 환영합니다.</p>
@@ -86,7 +145,7 @@ function App() {
           </div>
         )}
 
-        {hasStarted && (
+        {hasStarted && !finalEnd && (
           <div className="grid-container">
             {Array.from({ length: 9 }).map((_, index) => (
               <div key={index} className="grid-item">
@@ -102,11 +161,7 @@ function App() {
                     )}
                     {step === 3 && <Mask />}
                     {step === 4 && (
-                      <Target
-                        word={pair.target}
-                        onRespond={handleResponse}
-                        processing={processing}
-                      />
+                      <Target word={pair.target} onRespond={handleResponse} />
                     )}
                   </>
                 )}
@@ -177,4 +232,41 @@ const match = (position, index) => {
     (position === directions[2] && index === 7) ||
     (position === directions[3] && index === 1)
   );
+};
+
+const Table = ({ data }) => {
+  return (
+    <table>
+      <thead>
+        <tr>
+          {Object.keys(data[0]).map((key) => (
+            <th key={key}>{key}</th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {data.map((row, index) => (
+          <tr key={index}>
+            {Object.values(row).map((value, idx) => (
+              <td key={idx}>{value}</td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+};
+
+const getType = (type, isSameDir) => {
+  let ret = "";
+  ret += isSameDir ? "S" : "O";
+  return ret + "-" + type;
+};
+
+const getIsCorrected = (isF, type) => {
+  if (type === 3 && isF) {
+    return false;
+  }
+
+  return true;
 };
