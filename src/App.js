@@ -55,7 +55,7 @@ function App() {
     navigator.clipboard
       .writeText(copiedData)
       .then(() => {
-        alert("Data copied to clipboard");
+        alert("결과 복사 완료");
       })
       .catch((err) => {
         console.error("Failed to copy: ", err);
@@ -119,8 +119,8 @@ function App() {
       <div className="App">
         {finalEnd && (
           <div>
-            <Table data={data} />
-
+            <p>수고하셨습니다.</p>
+            <p>복사한 결과를 카톡으로 전송해주세요!</p>
             <button onClick={handleCopy}>결과 복사하기</button>
           </div>
         )}
@@ -171,12 +171,12 @@ function App() {
         )}
       </div>
 
-      {responseTime !== null && (
+      {/* {responseTime !== null && (
         <div className="Nav">
           <p>Response Time: {responseTime}ms</p>
           <p>Type: {pair.type}</p>
         </div>
-      )}
+      )} */}
     </>
   );
 }
