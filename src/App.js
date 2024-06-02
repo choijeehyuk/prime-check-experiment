@@ -69,16 +69,8 @@ function App() {
       setTimeout(() => setStep(4), 100);
     } else if (step === 4) {
       setStartTime(Date.now());
-      setTimeout(() => {
-        const responseTime = Date.now() - startTime;
-        console.log(responseTime);
-
-        if (responseTime > 2000) {
-          setStatus(State.End);
-        }
-      }, 2000);
     }
-  }, [status, step, resetExperiment, startTime]);
+  }, [status, step, resetExperiment]);
 
   const handleResponse = (isF) => {
     if (processing) return;
