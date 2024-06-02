@@ -227,9 +227,11 @@ const Target = ({ word, onRespond, setStatus, status }) => {
     const handleKeydown = (event) => {
       clearTimeout(responseTimeout);
 
-      if (event.key === "f" || event.key === "F") {
+      console.log(event);
+
+      if (event.key === "ㄹ" || event.key === "f" || event.key === "F") {
         onRespond(true);
-      } else if (event.key === "j" || event.key === "J") {
+      } else if (event.key === "ㅓ" || event.key === "j" || event.key === "J") {
         onRespond(false);
       }
     };
