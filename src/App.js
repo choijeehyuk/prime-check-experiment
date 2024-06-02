@@ -6,8 +6,8 @@ const directions = ["East", "West", "South", "North"];
 
 const getRandomElement = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
-const TOTAL_COUNT = 2;
-const PRACTICE_COUNT = 1;
+const TOTAL_COUNT = 10;
+const PRACTICE_COUNT = 4;
 
 const State = { Init: "INIT", Practice: "PRACTICE", Ing: "ING", End: "END" };
 
