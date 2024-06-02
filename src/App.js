@@ -6,14 +6,10 @@ const directions = ["East", "West", "South", "North"];
 
 const getRandomElement = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
-const TOTAL_COUNT = 10;
+const TOTAL_COUNT = 2;
+const PRACTICE_COUNT = 1;
 
-// type
-const data = [
-  { Name: "John Doe", Age: 28, Country: "USA" },
-  { Name: "Anna Smith", Age: 24, Country: "UK" },
-  { Name: "Peter Johnson", Age: 32, Country: "Canada" },
-];
+const State = { Init: "INIT", Practice: "PRACTICE", Ing: "ING", End: "END" };
 
 function App() {
   const [total, setTotal] = useState(1);
@@ -23,20 +19,17 @@ function App() {
 
   const [primePosition, setPrimePosition] = useState("");
   const [startTime, setStartTime] = useState(0);
-  const [responseTime, setResponseTime] = useState(null);
 
   const [processing, setProcessing] = useState(false);
+
+  const [status, setStatus] = useState(State.Init);
 
   const resetExperiment = useCallback(() => {
     setDirection(getRandomElement(directions));
     setPair(getRandomElement(pairs));
     setPrimePosition(getRandomElement(directions));
     setStep(1);
-    setResponseTime(null);
   }, []);
-
-  const [hasStarted, setHasStarted] = useState(false);
-  const [finalEnd, setFinalEnd] = useState(false);
 
   const [result, setResult] = useState([]);
 
@@ -63,7 +56,7 @@ function App() {
   };
 
   useEffect(() => {
-    if (!hasStarted) return;
+    if (status !== State.Ing) return;
     if (step === -1) {
       setTimeout(() => setStep(0), 1000);
     } else if (step === 0) {
@@ -76,15 +69,22 @@ function App() {
       setTimeout(() => setStep(4), 100);
     } else if (step === 4) {
       setStartTime(Date.now());
+      setTimeout(() => {
+        const responseTime = Date.now() - startTime;
+        console.log(responseTime);
+
+        if (responseTime > 2000) {
+          setStatus(State.End);
+        }
+      }, 2000);
     }
-  }, [hasStarted, step, resetExperiment]);
+  }, [status, step, resetExperiment, startTime]);
 
   const handleResponse = (isF) => {
     if (processing) return;
     setProcessing(true);
 
     const responseTime = Date.now() - startTime;
-    setResponseTime(responseTime);
 
     const data = {
       isF,
@@ -97,9 +97,19 @@ function App() {
     setResult(state);
 
     setTotal((prev) => prev + 1);
-    if (total === TOTAL_COUNT) {
-      setFinalEnd(true);
+
+    if (total === PRACTICE_COUNT) {
+      setProcessing(false);
+      setStep(-1);
+      setStatus(State.Practice);
+      return;
     }
+
+    if (total === TOTAL_COUNT) {
+      setStatus(State.End);
+      return;
+    }
+
     setTimeout(() => {
       setProcessing(false);
       setStep(0);
@@ -107,26 +117,45 @@ function App() {
   };
 
   useEffect(() => {
-    window.addEventListener("keydown", () => {
-      if (!hasStarted) {
-        setHasStarted(true);
+    const handleKeyDown = () => {
+      if (status === State.Init || status === State.Practice) {
+        setStatus(State.Ing);
       }
-    });
-  }, []);
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [status]);
 
   return (
     <>
       <div className="App">
-        {finalEnd && (
-          <div>
-            <p>수고하셨습니다.</p>
-            <p>복사한 결과를 카톡으로 전송해주세요!</p>
-            <button onClick={handleCopy}>결과 복사하기</button>
+        {status === State.Practice && (
+          <div className="init-container">
+            <p>연습세션이 종료되었습니다.</p>
+            <p>키를 누르면 본세션이 시작됩니다.</p>
+            <p>실험 예상 소요 시간은 5분입니다.</p>
           </div>
         )}
 
-        {!hasStarted && !finalEnd && (
+        {status === State.End && (
           <div className="init-container">
+            <p>실험에 참여해주셔서 감사합니다.</p>
+            <p>[결과 복사하기] 버튼을 누른 후 실험 결과를</p>
+            <p> 실험 참여 요청자에게 [붙여넣기]하여 전송해주세요.</p>
+            <button onClick={handleCopy}>결과 복사하기</button>
+            <p>Supervised by 전종섭 교수</p>
+            <p>Conceptualized by 이정윤</p>
+          </div>
+        )}
+
+        {status === State.Init && (
+          <div className="init-container">
+            <h1>부주의맹-점화 효과 실험</h1>
+            <h3>Inattentional blindness- Priming effect Experiment</h3>
             <p>안녕하세요.</p>
             <p>실험에 참여한 것을 환영합니다.</p>
             <p>화면의 중앙의 점을</p>
@@ -135,24 +164,19 @@ function App() {
             <p>단어가 단어라면 F, 단어가 아니라면 J를 눌러주세요.</p>
             <p>최대한 빨리</p>
             <p>판단할 수 있도록 노력해보세요!</p>
-            <p>
-              한번씩 판단을 내릴 때마다, 다음 단어가 나오기 전 잠시동안 중앙의
-              점이 등장합니다.
-            </p>
             <p>점을 응시해주세요.</p>
-            <p>아무키나 누르면 실험이 시작됩니다.</p>
+            <p>키를 누르면 연습세션이 시작됩니다.</p>
             <p>실험 예상 소요 시간은 5분입니다.</p>
           </div>
         )}
 
-        {hasStarted && !finalEnd && (
+        {status === State.Ing && (
           <div className="grid-container">
             {Array.from({ length: 9 }).map((_, index) => (
               <div key={index} className="grid-item">
                 {step === 2 && match(primePosition, index) && (
                   <Prime word={pair.prime} position={primePosition} />
                 )}
-
                 {index === 4 && (
                   <>
                     {step === -1 && <div className="dot">•</div>}
@@ -170,13 +194,6 @@ function App() {
           </div>
         )}
       </div>
-
-      {/* {responseTime !== null && (
-        <div className="Nav">
-          <p>Response Time: {responseTime}ms</p>
-          <p>Type: {pair.type}</p>
-        </div>
-      )} */}
     </>
   );
 }
@@ -231,29 +248,6 @@ const match = (position, index) => {
     (position === directions[1] && index === 3) ||
     (position === directions[2] && index === 7) ||
     (position === directions[3] && index === 1)
-  );
-};
-
-const Table = ({ data }) => {
-  return (
-    <table>
-      <thead>
-        <tr>
-          {Object.keys(data[0]).map((key) => (
-            <th key={key}>{key}</th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {data.map((row, index) => (
-          <tr key={index}>
-            {Object.values(row).map((value, idx) => (
-              <td key={idx}>{value}</td>
-            ))}
-          </tr>
-        ))}
-      </tbody>
-    </table>
   );
 };
 
