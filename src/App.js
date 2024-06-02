@@ -177,7 +177,12 @@ function App() {
                     )}
                     {step === 3 && <Mask />}
                     {step === 4 && (
-                      <Target word={pair.target} onRespond={handleResponse} />
+                      <Target
+                        word={pair.target}
+                        onRespond={handleResponse}
+                        setStatus={setStatus}
+                        status={State}
+                      />
                     )}
                   </>
                 )}
@@ -211,10 +216,17 @@ const Mask = () => (
   </div>
 );
 
-const Target = ({ word, onRespond }) => {
+const Target = ({ word, onRespond, setStatus, status }) => {
   useEffect(() => {
     // 여기서 맞았는지도 테스트해야할듯?
+
+    let responseTimeout = setTimeout(() => {
+      setStatus(State.End);
+    }, 2000);
+
     const handleKeydown = (event) => {
+      clearTimeout(responseTimeout);
+
       if (event.key === "f" || event.key === "F") {
         onRespond(true);
       } else if (event.key === "j" || event.key === "J") {
@@ -222,8 +234,11 @@ const Target = ({ word, onRespond }) => {
       }
     };
     window.addEventListener("keydown", handleKeydown);
-    return () => window.removeEventListener("keydown", handleKeydown);
-  }, [onRespond]);
+    return () => {
+      clearTimeout(responseTimeout);
+      window.removeEventListener("keydown", handleKeydown);
+    };
+  }, [onRespond, setStatus, status]);
 
   return (
     <div className="Target">
