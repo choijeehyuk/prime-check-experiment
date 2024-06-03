@@ -6,10 +6,42 @@ const directions = ["East", "West", "South", "North"];
 
 const getRandomElement = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
-const TOTAL_COUNT = 10;
 const PRACTICE_COUNT = 4;
+const TOTAL_COUNT = PRACTICE_COUNT + 80;
+const MAX_TYPE_COUNT = 10;
+
+const __getRandomDataSet = () => {
+  const d1 = getRandomElement(directions);
+  const d2 = getRandomElement(directions);
+  const pair = getRandomElement(pairs);
+
+  return { d1, d2, pair, type: getType(pair.type, d1 === d2) };
+};
+
+const getRandomDataSet = (db, total) => {
+  const { d1, d2, pair, type } = __getRandomDataSet();
+
+  if (total <= PRACTICE_COUNT) {
+    return { d1, d2, pair, type };
+  }
+
+  const count = db[type];
+  if (typeof count !== "number") {
+    db[type] = 1;
+    return { d1, d2, pair, type };
+  }
+
+  if (count < MAX_TYPE_COUNT) {
+    ++db[type];
+    return { d1, d2, pair, type };
+  }
+
+  return getRandomDataSet(db);
+};
 
 const State = { Init: "INIT", Practice: "PRACTICE", Ing: "ING", End: "END" };
+
+const db = {};
 
 function App() {
   const [total, setTotal] = useState(1);
@@ -25,11 +57,15 @@ function App() {
   const [status, setStatus] = useState(State.Init);
 
   const resetExperiment = useCallback(() => {
-    setDirection(getRandomElement(directions));
-    setPair(getRandomElement(pairs));
-    setPrimePosition(getRandomElement(directions));
+    console.log(total);
+    const { d1, d2, pair } = getRandomDataSet(db, total);
+    console.log(db);
+    setDirection(d1);
+    setPrimePosition(d2);
+    setPair(pair);
+
     setStep(1);
-  }, []);
+  }, [total, db]);
 
   const [result, setResult] = useState([]);
 
@@ -105,7 +141,7 @@ function App() {
     setTimeout(() => {
       setProcessing(false);
       setStep(0);
-    }, 1000);
+    }, 50);
   };
 
   useEffect(() => {
@@ -218,16 +254,12 @@ const Mask = () => (
 
 const Target = ({ word, onRespond, setStatus, status }) => {
   useEffect(() => {
-    // 여기서 맞았는지도 테스트해야할듯?
-
     let responseTimeout = setTimeout(() => {
       setStatus(State.End);
-    }, 2000);
+    }, 20000);
 
     const handleKeydown = (event) => {
       clearTimeout(responseTimeout);
-
-      console.log(event);
 
       if (event.key === "ㄹ" || event.key === "f" || event.key === "F") {
         onRespond(true);
