@@ -258,7 +258,7 @@ const Target = ({ word, onRespond, setStatus, status }) => {
   useEffect(() => {
     let responseTimeout = setTimeout(() => {
       setStatus(State.End);
-    }, 20000);
+    }, 2000);
 
     const handleKeydown = (event) => {
       clearTimeout(responseTimeout);
