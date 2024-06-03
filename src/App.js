@@ -206,7 +206,10 @@ function App() {
             <p>실험 예상 소요 시간은 5분입니다.</p>
 
             <p style={{ fontSize: "14px", fontWeight: "normal" }}>
-              예) 테이블, 꽃 -> F 블립, 퀔 -> J
+              예) 테이블, 꽃 -> F
+            </p>
+            <p style={{ fontSize: "14px", fontWeight: "normal" }}>
+              블립, 퀔 -> J
             </p>
           </div>
         )}
