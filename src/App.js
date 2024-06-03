@@ -184,19 +184,30 @@ function App() {
           <div className="init-container">
             <h1>부주의맹-점화 효과 실험</h1>
             <h3>Inattentional blindness- Priming effect Experiment</h3>
+            <br />
+
             <p>안녕하세요.</p>
             <p>실험에 참여한 것을 환영합니다.</p>
-            <p>화면의 중앙의 점을 응시하면</p>
+            <p>화면의 중앙의 점을 응시하면,</p>
             <p>검은색 단어가 화면 중앙에 나타날 것입니다.</p>
+            <br />
             <p>
               나타난 검은색 글자가, 올바른 한국어 단어라면 <b>F</b>,
             </p>
             <p>
               단어가 아니라면 <b>J</b>를 눌러주세요.
             </p>
+            <br />
+
             <p>최대한 빨리 판단할 수 있도록 노력해보세요!</p>
+            <br />
+
             <p>아무 키나 누르면 연습세션이 시작됩니다.</p>
             <p>실험 예상 소요 시간은 5분입니다.</p>
+
+            <p style={{ fontSize: "14px", fontWeight: "normal" }}>
+              예) 테이블, 꽃 -> F 블립, 퀔 -> J
+            </p>
           </div>
         )}
 
