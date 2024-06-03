@@ -45,6 +45,7 @@ const db = {};
 
 function App() {
   const [total, setTotal] = useState(1);
+
   const [step, setStep] = useState(-1);
   const [direction, setDirection] = useState("");
   const [pair, setPair] = useState({ prime: "", target: "", type: 0 });
@@ -57,9 +58,7 @@ function App() {
   const [status, setStatus] = useState(State.Init);
 
   const resetExperiment = useCallback(() => {
-    console.log(total);
     const { d1, d2, pair } = getRandomDataSet(db, total);
-    console.log(db);
     setDirection(d1);
     setPrimePosition(d2);
     setPair(pair);
@@ -124,17 +123,17 @@ function App() {
     const state = [...result, data];
     setResult(state);
 
+    if (total === TOTAL_COUNT) {
+      setStatus(State.End);
+      return;
+    }
+
     setTotal((prev) => prev + 1);
 
     if (total === PRACTICE_COUNT) {
       setProcessing(false);
       setStep(-1);
       setStatus(State.Practice);
-      return;
-    }
-
-    if (total === TOTAL_COUNT) {
-      setStatus(State.End);
       return;
     }
 
@@ -169,16 +168,21 @@ function App() {
           </div>
         )}
 
-        {status === State.End && (
-          <div className="init-container">
-            <p>실험에 참여해주셔서 감사합니다.</p>
-            <p>[결과 복사하기] 버튼을 누른 후 실험 결과를</p>
-            <p> 실험 참여 요청자에게 [붙여넣기]하여 전송해주세요.</p>
-            <button onClick={handleCopy}>결과 복사하기</button>
-            <p>Supervised by 전종섭 교수</p>
-            <p>Conceptualized by 이정윤</p>
-          </div>
-        )}
+        {status === State.End &&
+          (total === TOTAL_COUNT ? (
+            <div className="init-container">
+              <p>실험에 참여해주셔서 감사합니다.</p>
+              <p>[결과 복사하기] 버튼을 누른 후 실험 결과를</p>
+              <p> 실험 참여 요청자에게 [붙여넣기]하여 전송해주세요.</p>
+              <button onClick={handleCopy}>결과 복사하기</button>
+              <p>Supervised by 전종섭 교수</p>
+              <p>Conceptualized by 이정윤</p>
+            </div>
+          ) : (
+            <div className="init-container">
+              <p>탈락되었습니다.</p>
+            </div>
+          ))}
 
         {status === State.Init && (
           <div className="init-container">
@@ -272,7 +276,7 @@ const Target = ({ word, onRespond, setStatus, status }) => {
   useEffect(() => {
     let responseTimeout = setTimeout(() => {
       setStatus(State.End);
-    }, 2000);
+    }, 15000);
 
     const handleKeydown = (event) => {
       clearTimeout(responseTimeout);
