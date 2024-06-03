@@ -299,7 +299,7 @@ const getType = (type, isSameDir) => {
 };
 
 const getIsCorrected = (isF, type) => {
-  if (type === 3 && isF) {
+  if (type === 2 && isF) {
     return false;
   }
 
