@@ -79,7 +79,35 @@ function App() {
       });
     }
 
-    const copiedData = JSON.stringify(list, null, 2);
+    const map = {};
+    list.forEach((item) => {
+      if (map[item.type]) {
+        map[item.type].push(item);
+      } else {
+        map[item.type] = [item];
+      }
+    });
+
+    console.log(map);
+
+    const finalResult = [];
+
+    for (const [type, list] of Object.entries(map)) {
+      const totalResponseTime = list.reduce(
+        (pre, cur) => pre + cur.responseTime,
+        0
+      );
+      const totalCorrectedCnt = list.filter(
+        ({ isCorrected }) => isCorrected
+      ).length;
+      const averageResponseTime = totalResponseTime / MAX_TYPE_COUNT;
+      const correctedRate = totalCorrectedCnt / MAX_TYPE_COUNT;
+      finalResult.push({ type, averageResponseTime, correctedRate });
+    }
+
+    console.log(finalResult);
+
+    const copiedData = JSON.stringify(finalResult, null, 2);
     navigator.clipboard
       .writeText(copiedData)
       .then(() => {
@@ -134,6 +162,7 @@ function App() {
       setProcessing(false);
       setStep(-1);
       setStatus(State.Practice);
+      setResult([]);
       return;
     }
 
